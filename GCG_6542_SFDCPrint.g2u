@@ -1,0 +1,292 @@
+﻿Program.Sub.Preflight.Start
+V.Global.bConOpen.Declare(Boolean, False)
+Program.Sub.Preflight.End
+
+Program.Sub.Main.Start
+F.Intrinsic.Control.Try
+	V.Local.sScriptNames.Declare
+	V.Local.sRet.Declare
+	
+	F.Intrinsic.Control.SelectCase(V.Caller.Hook)
+		F.Intrinsic.Control.Case(49710)
+			V.Local.sScriptNames.Set(V.Passed.MainFormView-windowsUIButtonPanel-1)
+			F.Intrinsic.String.Replace(V.Local.sScriptNames, "Script 1", "Print WO Labels", V.Local.sScriptNames)
+			V.Passed.MainFormView-windowsUIButtonPanel-1.Set(V.Local.sScriptNames)
+		F.Intrinsic.Control.Case(50700)
+			F.Intrinsic.BDF.Load("Grid", "MainFormView-gridView-bdf")
+			F.Intrinsic.BDF.Load("Grid1", "MainFormView-gridViewOperations-bdf")
+			F.Intrinsic.BDF.Load("Grid2", "MainFormView-treeList-bdf")
+			
+'			F.ODBC.Connection!con.OpenCompanyConnection
+'			V.Global.bConOpen.Set(True)
+'			F.Intrinsic.Control.CallSub(loadData)
+'			F.ODBC.Connection!con.Close
+'			V.Global.bConOpen.Set(False)
+		F.Intrinsic.Control.Case(49760)
+			F.ODBC.Connection!con.OpenCompanyConnection
+			V.Global.bConOpen.Set(True)
+			F.Intrinsic.Control.CallSub(createWOBrowser)
+			F.ODBC.Connection!con.Close
+			V.Global.bConOpen.Set(False)
+	F.Intrinsic.Control.EndSelect
+F.Intrinsic.Control.Catch
+	F.Intrinsic.Control.CallSub(ErrorMsg, CurrentSub, V.Ambient.CurrentSubroutine)
+F.Intrinsic.Control.EndTry
+Program.Sub.Main.End
+
+Program.Sub.ErrorMsg.Start
+V.Local.sError.Declare
+
+F.Intrinsic.Control.If(V.Global.bConOpen)
+	F.ODBC.Connection!con.Close
+F.Intrinsic.Control.EndIf	
+
+'Generic Error message.
+f.Intrinsic.String.Build("Project GCG_6542_SFDCPrint.g2u {0}{0}Subroutine: {1}{0}Error: {2} with Description: {3}", v.Ambient.NewLine, v.Args.CurrentSub, v.Ambient.ErrorNumber, v.Ambient.ErrorDescription, v.Local.sError)
+f.Intrinsic.UI.Msgbox(v.Local.sError)
+Program.Sub.ErrorMsg.End
+
+Program.Sub.loadData.Start
+F.Intrinsic.Control.Try
+	V.Local.sSQL.Declare
+	V.Local.sLabelPath.Declare
+	V.Local.sRet.Declare
+	V.Local.sWO.Declare
+	V.Local.sSuffix.Declare
+	V.Local.bWrongRecord.Declare(Boolean, False)
+	'***ANY CHANGES MADE HERE MUST ALSO BE MADE TO GCG_6542_PrinterSelectionPreProc.g2u as part of the stand alone menu item***
+	
+	'Y_SF_WORKORD: Y (To know which WO was selected for printing)
+		'Above table will be immitated from other tables 
+		'WO, WO_SUFFIX, SEQ, PART, DESCR, CUSTOMER_NBR, CUSTOMER_NAME, SO, SO_LINE, INTL_ADDR
+		'V_JOB_HEADER JH
+		'V_CUSTOMER_MASTER C
+		'ORDER_TO_WO OW
+		'V_JOB_SERIAL J 
+	'ORDER_TO_WO: OW (Est link between WO > SO)
+	'ORDER_CONFIG: O (Filter corresponding SO and PARENT_IDENTIFIER by info you want e.g. SYSSQUARE etc & get part) 
+	'INV_EXTRA: I (From part, look at corresponding user fields to get label info)
+	'CUSTOMER_MASTER: C Grab international flag to determine which labels to print
+	'JOB_SERIAL: J Based on selected WO, grab the serial number from here 
+	F.Intrinsic.String.Split(V.Args.workOrder, "*!*", V.Local.sRet)
+	V.Local.sWO.Set(V.Local.sRet(0).Trim)
+	V.Local.sSuffix.Set(V.Local.sRet(1).Trim)
+	
+	'Logic to select same info that would be in Y table
+	F.Intrinsic.String.Build("select JH.JOB as WO, JH.SUFFIX as WO_SUFFIX, (OW.ORDER_NO + OW.ORDER_LINE) as MATCH, JH.PART, JH.DESCRIPTION as DESCR, J.SERIAL_START as SERIAL, JH.CUSTOMER as CUSTOMER_NBR, C.NAME_CUSTOMER as CUSTOMER_NAME, OW.ORDER_NO as SO, OW.ORDER_LINE as SO_LINE, C.INTL_ADDR from V_JOB_HEADER JH left join ORDER_TO_WO OW on JH.JOB = OW.JOB and JH.SUFFIX = OW.SUFFIX left join V_CUSTOMER_MASTER C on JH.CUSTOMER = C.CUSTOMER left join V_JOB_SERIAL J on right(J.JOB, 6) = OW.JOB where JH.JOB = '{0}' and JH.SUFFIX = '{1}'", V.Local.sWO, V.Local.sSuffix, V.Local.sSQL)
+	F.Data.DataTable.CreateFromSQL("dtPreWOL", "con", V.Local.sSQL)
+	F.Data.DataView.Create("dtPreWOL", "dvWOL", 22)
+	F.Data.DataView.ToDataTableDistinct("dtPreWOL", "dvWOL", "dtWOL", "WO*!*WO_SUFFIX*!*MATCH*!*PART*!*DESCR*!*SERIAL*!*CUSTOMER_NBR*!*CUSTOMER_NAME*!*SO*!*SO_LINE*!*INTL_ADDR")
+	F.Data.DataTable.Close("dtPreWOL")
+	
+	'BM Create new columns with info for labels.
+	F.Data.DataTable.AddColumn("dtWOL", "VOLT", "String")
+	F.Data.DataTable.AddColumn("dtWOL", "AMP", "String")
+	F.Data.DataTable.AddColumn("dtWOL", "HZ", "String")
+	F.Data.DataTable.AddColumn("dtWOL", "POWER", "String")
+	F.Data.DataTable.AddColumn("dtWOL", "COLOR", "String")
+	F.Data.DataTable.AddColumn("dtWOL", "CABINET", "String")
+	F.Data.DataTable.AddColumn("dtWOL", "TITLE", "String")
+	
+	'BM Create criteria for Volt, Amp, power, and Hz dictionaries
+	'Change to scope. Not using syssquare or sysround, using ASBLM% in Idenfifier column 
+	'F.Intrinsic.String.Build("select ORDER_NO + ORDER_LINE as MATCH, IDENTIFIER as PART from V_ORDER_CONFIG where ORDER_NO = '{0}' and ORDER_LINE = '{1}' and (PARENT_IDENTIFIER = 'SYSSQUARE' or PARENT_IDENTIFIER = 'SYSROUND')", V.DataTable.dtWOL(0).SO!FieldVal, V.DataTable.dtWOL(0).SO_LINE!FieldVal, V.Local.sSql)
+	
+	F.Intrinsic.String.Build("select ORDER_NO + ORDER_LINE as MATCH, IDENTIFIER as PART from V_ORDER_CONFIG where ORDER_NO = '{0}' and ORDER_LINE = '{1}' and IDENTIFIER like 'ASBL%'", V.DataTable.dtWOL(0).SO!FieldVal, V.DataTable.dtWOL(0).SO_LINE!FieldVal, V.Local.sSql)
+	F.Data.DataTable.CreateFromSQL("dtPrePhysMatch", "con", V.Local.sSql)
+	
+	'BM error in NOrdic's system where some IDs are not set up right (ends w asbl instead of starting). This will catch those instances and warn user 
+	F.Intrinsic.Control.If(V.DataTable.dtPrePhysMatch.RowCount, <, 1)
+		F.Data.DataTable.Close("dtPrePhysMatch")
+		F.Intrinsic.String.Build("select ORDER_NO + ORDER_LINE as MATCH, IDENTIFIER as PART from V_ORDER_CONFIG where ORDER_NO = '{0}' and ORDER_LINE = '{1}' and IDENTIFIER like '%ASBL'", V.DataTable.dtWOL(0).SO!FieldVal, V.DataTable.dtWOL(0).SO_LINE!FieldVal, V.Local.sSql)
+		F.Data.DataTable.CreateFromSQL("dtPrePhysMatch", "con", V.Local.sSQL)
+		'BM Account for situation where user wants to reprint label that has already been shipped/invoiced (or partially). If completely shipped, will not be in ORDER_CONFIG will instead be in CONFIG_LN_HIST, so look there. If not there then error
+		F.Intrinsic.Control.If(V.DataTable.dtPrePhysMatch.RowCount, <, 1)
+			F.Data.DataTable.Close("dtPrePhysMatch")
+			F.Intrinsic.String.Build("select ORDER_NO + ORDER_LINE as MATCH, IDENT as PART from CONFIG_LN_HIST where ORDER_NO = '{0}' and ORDER_LINE = '{1}' and IDENT like 'ASBL%'", V.DataTable.dtWOL(0).SO!FieldVal, V.DataTable.dtWOL(0).SO_LINE!FieldVal, V.Local.sSql)
+			F.Data.DataTable.CreateFromSQL("dtPrePhysMatch", "con", V.Local.sSQL)
+			'Check history for instance where they have the IDENTIFIER as ASBL
+			F.Intrinsic.Control.If(V.DataTable.dtPrePhysMatch.RowCount, <, 1)
+				F.Data.DataTable.Close("dtPrePhysMatch")
+				F.Intrinsic.String.Build("select ORDER_NO + ORDER_LINE as MATCH, IDENT as PART from CONFIG_LN_HIST where ORDER_NO = '{0}' and ORDER_LINE = '{1}' and IDENT like '%ASBL'", V.DataTable.dtWOL(0).SO!FieldVal, V.DataTable.dtWOL(0).SO_LINE!FieldVal, V.Local.sSql)
+				F.Data.DataTable.CreateFromSQL("dtPrePhysMatch", "con", V.Local.sSQL)
+				F.Intrinsic.Control.If(V.DataTable.dtPrePhysMatch.RowCount, >, 0)
+					V.Local.bWrongRecord.Set(True)
+				F.Intrinsic.Control.EndIf
+			F.Intrinsic.Control.EndIf
+		F.Intrinsic.Control.Else
+			V.Local.bWrongRecord.Set(True)
+		F.Intrinsic.Control.EndIf
+	F.Intrinsic.Control.EndIf
+	
+	F.Data.DataView.Create("dtPrePhysMatch", "dvPrePhysMatch", 22)
+	F.Data.DataView.ToDataTableDistinct("dtPrePhysMatch", "dvPrePhysMatch", "dtPhysMatch", "MATCH*!*PART")
+	F.Intrinsic.Control.If(V.DataTable.dtPhysMatch.RowCount, <, 1)
+		F.Intrinsic.UI.Msgbox("No voltage, current, or cycle configurator options were found for selected work order and/or corresponding sales order.")
+		F.Intrinsic.Control.End
+	F.Intrinsic.Control.ElseIf(V.Local.bWrongRecord)
+		F.Intrinsic.UI.Msgbox("Voltage, current, and cycle configuration options were found, but part is set up wrong (ends with ASBL rather than starting).", "Warning")
+	F.Intrinsic.Control.EndIf
+	'BM Create Volt, Amp, Hz dictionaries
+	'F.Intrinsic.String.Build("select IDENTIFIER as PART, USER2 as VOLT from INV_EXTRA where PART = '{0}'", V.DataTable.dtPhysMatch(0).PART!FieldVal, V.Local.sSql)
+	F.Intrinsic.String.Build("select '{0}{1}' as MATCH, USER2 as VOLT from INV_EXTRA where PART = '{2}'", V.DataTable.dtWOL(0).SO!FieldVal, V.DataTable.dtWOL(0).SO_LINE!FieldVal, V.DataTable.dtPhysMatch(0).PART!FieldValTrim, V.Local.sSql)
+	F.Data.Dictionary.CreateFromSQL("dictVolt", "con", V.Local.sSql)
+	F.Intrinsic.String.Build("select '{0}{1}' as MATCH, USER3 as AMP from INV_EXTRA where PART = '{2}'", V.DataTable.dtWOL(0).SO!FieldVal, V.DataTable.dtWOL(0).SO_LINE!FieldVal, V.DataTable.dtPhysMatch(0).PART!FieldValTrim, V.Local.sSql)
+	F.Data.Dictionary.CreateFromSQL("dictAmp", "con", V.Local.sSql)
+	F.Intrinsic.String.Build("select '{0}{1}' as MATCH, USER6 as POWER from INV_EXTRA where PART = '{2}'", V.DataTable.dtWOL(0).SO!FieldVal, V.DataTable.dtWOL(0).SO_LINE!FieldVal, V.DataTable.dtPhysMatch(0).PART!FieldValTrim, V.Local.sSql)
+	F.Data.Dictionary.CreateFromSQL("dictPower", "con", V.Local.sSql)
+	F.Intrinsic.String.Build("select '{0}{1}' as MATCH, USER4 as HZ from INV_EXTRA where PART = '{2}'", V.DataTable.dtWOL(0).SO!FieldVal, V.DataTable.dtWOL(0).SO_LINE!FieldVal, V.DataTable.dtPhysMatch(0).PART!FieldValTrim, V.Local.sSql)
+	F.Data.Dictionary.CreateFromSQL("dictHz", "con", V.Local.sSql)
+	F.Data.DataTable.Close("dtPrePhysMatch")
+	F.Data.DataTable.Close("dtPhysMatch")
+	
+	'BM Create criteria for Color dictionary 
+	F.Intrinsic.String.Build("select ORDER_NO + ORDER_LINE as MATCH, IDENTIFIER as PART from V_ORDER_CONFIG where ORDER_NO = '{0}' and ORDER_LINE = '{1}' and PARENT_IDENTIFIER like 'SHELL%'", V.DataTable.dtWOL(0).SO!FieldVal, V.DataTable.dtWOL(0).SO_LINE!FieldVal, V.Local.sSql)
+	F.Data.DataTable.CreateFromSQL("dtPrePhysMatch", "con", V.Local.sSql)
+	'F.Data.DataView.Create("dtPrePhysMatch", "dvPrePhysMatch", 22)
+	'F.Data.DataView.ToDataTableDistinct("dtPrePhysMatch", "dvPrePhysMatch", "dtPhysMatch", "MATCH*!*PART")
+	F.Intrinsic.Control.If(V.DataTable.dtPrePhysMatch.RowCount, <, 1)
+		F.Data.DataTable.Close("dtPrePhysMatch")
+		'Account for reprint label situation
+		F.Intrinsic.String.Build("select ORDER_NO + ORDER_LINE as MATCH, IDENT as PART from CONFIG_LN_HIST where ORDER_NO = '{0}' and ORDER_LINE = '{1}' and PARENT_IDENT like 'SHELL%'", V.DataTable.dtWOL(0).SO!FieldVal, V.DataTable.dtWOL(0).SO_LINE!FieldVal, V.Local.sSql)
+		F.Data.DataTable.CreateFromSQL("dtPrePhysMatch", "con", V.Local.sSql)
+		F.Intrinsic.Control.If(V.DataTable.dtPrePhysMatch.RowCount, <, 1)
+			F.Intrinsic.UI.Msgbox("No color configurator options were found for selected work order and/or corresponding sales order.")
+			F.Intrinsic.Control.End
+		F.Intrinsic.Control.EndIf
+	F.Intrinsic.Control.EndIf
+	F.Data.DataView.Create("dtPrePhysMatch", "dvPrePhysMatch", 22)
+	F.Data.DataView.ToDataTableDistinct("dtPrePhysMatch", "dvPrePhysMatch", "dtPhysMatch", "MATCH*!*PART")
+	'BM Create Color dictionary
+	F.Intrinsic.String.Build("select '{0}{1}' as MATCH, USER7 as COLOR from INV_EXTRA where PART = '{2}'", V.DataTable.dtWOL(0).SO!FieldVal, V.DataTable.dtWOL(0).SO_LINE!FieldVal, V.DataTable.dtPhysMatch(0).PART!FieldValTrim, V.Local.sSql)
+	F.Data.Dictionary.CreateFromSQL("dictColor", "con", V.Local.sSql)
+	F.Data.DataTable.Close("dtPrePhysMatch")
+	F.Data.DataTable.Close("dtPhysMatch")
+	
+	'BM Create criteria for Cabinet Dictionary 
+	F.Intrinsic.String.Build("select ORDER_NO + ORDER_LINE as MATCH, IDENTIFIER as PART from V_ORDER_CONFIG where ORDER_NO = '{0}' and ORDER_LINE = '{1}' and PARENT_IDENTIFIER like 'PANEL%'", V.DataTable.dtWOL(0).SO!FieldVal, V.DataTable.dtWOL(0).SO_LINE!FieldVal, V.Local.sSql)
+	F.Data.DataTable.CreateFromSQL("dtPrePhysMatch", "con", V.Local.sSql)
+'	F.Data.DataView.Create("dtPrePhysMatch", "dvPrePhysMatch", 22)
+'	F.Data.DataView.ToDataTableDistinct("dtPrePhysMatch", "dvPrePhysMatch", "dtPhysMatch", "MATCH*!*PART")
+	F.Intrinsic.Control.If(V.DataTable.dtPrePhysMatch.RowCount, <, 1)
+		F.Data.DataTable.Close("dtPrePhysMatch")
+		'Account for reprint label situation
+		F.Intrinsic.String.Build("select ORDER_NO + ORDER_LINE as MATCH, IDENT as PART from CONFIG_LN_HIST where ORDER_NO = '{0}' and ORDER_LINE = '{1}' and PARENT_IDENT like 'PANEL%'", V.DataTable.dtWOL(0).SO!FieldVal, V.DataTable.dtWOL(0).SO_LINE!FieldVal, V.Local.sSql)
+		F.Data.DataTable.CreateFromSQL("dtPrePhysMatch", "con", V.Local.sSql)
+		F.Intrinsic.Control.If(V.DataTable.dtPrePhysMatch.RowCount, <, 1)
+			F.Intrinsic.UI.Msgbox("No cabinet configurator options were found for selected work order and/or corresponding sales order.")
+			F.Intrinsic.Control.End
+		F.Intrinsic.Control.EndIf
+	F.Intrinsic.Control.EndIf
+	F.Data.DataView.Create("dtPrePhysMatch", "dvPrePhysMatch", 22)
+	F.Data.DataView.ToDataTableDistinct("dtPrePhysMatch", "dvPrePhysMatch", "dtPhysMatch", "MATCH*!*PART")
+	'BM Create Cabinet Dictionary 
+	F.Intrinsic.String.Build("select '{0}{1}' as MATCH, USER8 as CABINET from INV_EXTRA where PART = '{2}'", V.DataTable.dtWOL(0).SO!FieldVal, V.DataTable.dtWOL(0).SO_LINE!FieldVal, V.DataTable.dtPhysMatch(0).PART!FieldValTrim, V.Local.sSql)
+	F.Data.Dictionary.CreateFromSQL("dictCabinet", "con", V.Local.sSql)
+	F.Data.DataTable.Close("dtPrePhysMatch")
+	F.Data.DataTable.Close("dtPhysMatch")
+	
+	'BM Create criteria for Title Dictionary 
+	F.Intrinsic.String.Build("select ORDER_NO + ORDER_LINE as MATCH, IDENTIFIER as PART from V_ORDER_CONFIG where ORDER_NO = '{0}' and ORDER_LINE = '{1}' and PARENT_IDENTIFIER like 'INS%'", V.DataTable.dtWOL(0).SO!FieldVal, V.DataTable.dtWOL(0).SO_LINE!FieldVal, V.Local.sSql)
+	F.Data.DataTable.CreateFromSQL("dtPrePhysMatch", "con", V.Local.sSql)
+'	F.Data.DataView.Create("dtPrePhysMatch", "dvPrePhysMatch", 22)
+'	F.Data.DataView.ToDataTableDistinct("dtPrePhysMatch", "dvPrePhysMatch", "dtPhysMatch", "MATCH*!*PART")
+	F.Intrinsic.Control.If(V.DataTable.dtPrePhysMatch.RowCount, <, 1)
+		F.Data.DataTable.Close("dtPrePhysMatch")
+		'Account for reprint label situation
+		F.Intrinsic.String.Build("select ORDER_NO + ORDER_LINE as MATCH, IDENT as PART from CONFIG_LN_HIST where ORDER_NO = '{0}' and ORDER_LINE = '{1}' and PARENT_IDENT like 'INS%'", V.DataTable.dtWOL(0).SO!FieldVal, V.DataTable.dtWOL(0).SO_LINE!FieldVal, V.Local.sSql)
+		F.Data.DataTable.CreateFromSQL("dtPrePhysMatch", "con", V.Local.sSql)
+		F.Intrinsic.Control.If(V.DataTable.dtPrePhysMatch.RowCount, <, 1)
+			F.Intrinsic.UI.Msgbox("No title 20 configurator options were found for selected work order and/or corresponding sales order.")
+			F.Intrinsic.Control.End
+		F.Intrinsic.Control.EndIf
+	F.Intrinsic.Control.EndIf
+	F.Data.DataView.Create("dtPrePhysMatch", "dvPrePhysMatch", 22)
+	F.Data.DataView.ToDataTableDistinct("dtPrePhysMatch", "dvPrePhysMatch", "dtPhysMatch", "MATCH*!*PART")
+	'BM Create Title Dictionary 
+	F.Intrinsic.String.Build("select '{0}{1}' as MATCH, USER9 as TITLE from INV_EXTRA where PART = '{2}'", V.DataTable.dtWOL(0).SO!FieldVal, V.DataTable.dtWOL(0).SO_LINE!FieldVal, V.DataTable.dtPhysMatch(0).PART!FieldValTrim, V.Local.sSql)
+	F.Data.Dictionary.CreateFromSQL("dictTitle", "con", V.Local.sSql)
+	F.Data.DataTable.Close("dtPrePhysMatch")
+	F.Data.DataTable.Close("dtPhysMatch")
+	
+	'Fill columns 
+	F.Data.Dictionary.SetDefaultReturn("dictVolt", "")
+	F.Data.Dictionary.SetDefaultReturn("dictAmp", "")
+	F.Data.Dictionary.SetDefaultReturn("dictPower", "")
+	F.Data.Dictionary.SetDefaultReturn("dictHz", "")
+	F.Data.Dictionary.SetDefaultReturn("dictColor", "")
+	F.Data.Dictionary.SetDefaultReturn("dictCabinet", "")
+	F.Data.Dictionary.SetDefaultReturn("dictTitle", "")
+	
+	F.Data.DataTable.FillFromDictionary("dtWOL", "dictVolt", "MATCH", "VOLT")
+	F.Data.DataTable.FillFromDictionary("dtWOL", "dictAmp", "MATCH", "AMP")
+	F.Data.DataTable.FillFromDictionary("dtWOL", "dictPower", "MATCH", "POWER")
+	F.Data.DataTable.FillFromDictionary("dtWOL", "dictHz", "MATCH", "HZ")
+	F.Data.DataTable.FillFromDictionary("dtWOL", "dictColor", "MATCH", "COLOR")
+	F.Data.DataTable.FillFromDictionary("dtWOL", "dictCabinet", "MATCH", "CABINET")
+	F.Data.DataTable.FillFromDictionary("dtWOL", "dictTitle", "MATCH", "TITLE")
+	
+	F.Data.Dictionary.Close("dictVolt")
+	F.Data.Dictionary.Close("dictAmp")
+	F.Data.Dictionary.Close("dictPower")
+	F.Data.Dictionary.Close("dictHz")
+	F.Data.Dictionary.Close("dictColor")
+	F.Data.Dictionary.Close("dictCabinet")
+	F.Data.Dictionary.Close("dictTitle")
+
+	
+	'Remove match column
+	F.Data.DataTable.RemoveColumn("dtWOL", "MATCH")
+
+F.Intrinsic.Control.If(V.DataTable.dtWOL.RowCount, >, -1)
+	F.Intrinsic.String.Build("{0}\LABELS\Custom\SF_WIP_FG_1835_WARNING.lab", V.Caller.BusintDir, V.Local.sLabelPath)
+	    F.Global.BI.PrintCodesoftLabelFromDataTable(-1, 1, "dtWOL", "WARNING LABEL", True, V.Local.sLabelPath, True)
+        'Determine if customer is international and use the right version based on that 
+        F.Intrinsic.Control.If(V.DataTable.dtWOL(0).INTL_ADDR!FieldValTrim, =, "Y")
+        	F.Intrinsic.String.Build("{0}\LABELS\Custom\SF_WIP_FG_1835_BAG_EE.lab", V.Caller.BusintDir, V.Local.sLabelPath)
+	        F.Global.BI.PrintCodesoftLabelFromDataTable(-1, 1, "dtWOL", "BAG LABEL", True, V.Local.sLabelPath, True)
+	        F.Intrinsic.String.Build("{0}\LABELS\Custom\SF_WIP_FG_1835_CERT_EE.lab", V.Caller.BusintDir, V.Local.sLabelPath)
+	        F.Global.BI.PrintCodesoftLabelFromDataTable(-1, 1, "dtWOL", "CERTIFICATION LABEL", True, V.Local.sLabelPath, True)
+	        F.Intrinsic.String.Build("{0}\LABELS\Custom\SF_WIP_FG_1835_SERIAL_EE.lab", V.Caller.BusintDir, V.Local.sLabelPath)
+	        F.Global.BI.PrintCodesoftLabelFromDataTable(-1, 1, "dtWOL", "SERIAL LABEL", True, V.Local.sLabelPath, True)
+        F.Intrinsic.Control.Else
+        	F.Intrinsic.String.Build("{0}\LABELS\Custom\SF_WIP_FG_1835_BAG.lab", V.Caller.BusintDir, V.Local.sLabelPath)
+	        F.Global.BI.PrintCodesoftLabelFromDataTable(-1, 1, "dtWOL", "BAG LABEL", True, V.Local.sLabelPath, True)
+	        F.Intrinsic.String.Build("{0}\LABELS\Custom\SF_WIP_FG_1835_CERT.lab", V.Caller.BusintDir, V.Local.sLabelPath)
+	        F.Global.BI.PrintCodesoftLabelFromDataTable(-1, 1, "dtWOL", "CERTIFICATION LABEL", True, V.Local.sLabelPath, True)
+	        F.Intrinsic.String.Build("{0}\LABELS\Custom\SF_WIP_FG_1835_SERIAL.lab", V.Caller.BusintDir, V.Local.sLabelPath)
+	        F.Global.BI.PrintCodesoftLabelFromDataTable(-1, 1, "dtWOL", "SERIAL LABEL", True, V.Local.sLabelPath, True)
+        F.Intrinsic.Control.EndIf    
+F.Intrinsic.Control.EndIf
+	
+	
+F.Intrinsic.Control.Catch
+	F.Intrinsic.Control.CallSub(ErrorMsg, CurrentSub, V.Ambient.CurrentSubroutine)
+F.Intrinsic.Control.EndTry
+Program.Sub.loadData.End
+
+Program.Sub.createWOBrowser.Start
+F.Intrinsic.Control.Try
+	V.Local.sRet.Declare
+	V.Local.sTitles.Declare
+	V.Local.iWidths.Declare
+
+	F.Intrinsic.String.Split("Work Order*!*Suffix*!*Part*!*Description", "*!*", V.Local.sTitles)
+	F.Intrinsic.String.Split("1000*!*800*!*2000*!*3000", "*!*", V.Local.iWidths)
+	F.Intrinsic.UI.Browser("Select a Work Order to Print Labels For", "con", "select JOB, SUFFIX, PART, DESCRIPTION from V_JOB_HEADER order by JOB", V.Local.sTitles, V.Local.iWidths, V.Local.sRet)
+	
+	F.Intrinsic.Control.If(V.Local.sRet, <>, "***CANCEL***")
+		F.Intrinsic.Control.CallSub(loadData, workOrder, V.Local.sRet)
+	F.Intrinsic.Control.Else
+		F.Intrinsic.Control.End
+	F.Intrinsic.Control.EndIf
+	
+F.Intrinsic.Control.Catch
+	F.Intrinsic.Control.CallSub(ErrorMsg, CurrentSub, V.Ambient.CurrentSubroutine)
+F.Intrinsic.Control.EndTry
+Program.Sub.createWOBrowser.End
+
+Program.Sub.Comments.Start
+${$5$}$3.0.0.0$}$1
+${$6$}$bmedina$}$20220407112322427$}$kOipCrsyLBVj2KoSwkcdK23ChxGVcBlEwmHmP2NDT4gN0Sja8g1er2B14JMrcEMY2X6meX99/VM=
+Program.Sub.Comments.End
