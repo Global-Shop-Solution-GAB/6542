@@ -1,0 +1,417 @@
+﻿Program.Sub.ScreenSU.Start
+Program.Sub.ScreenSU.End
+
+Program.Sub.Preflight.Start
+
+Variable.Global.iBIRunID.Declare(Long,-1)
+Variable.Global.iBILogID.Declare(Long,-1)
+'Variable.UDT.uWorkOrder.Define("BIRUNID",Long,"RUNID")
+'Variable.UDT.uWorkOrder.Define("WO",String,"WO")
+'Variable.UDT.uWorkOrder.Define("WO_SUFFIX",String,"WO_SUFFIX")
+'Variable.UDT.uWorkOrder.Define("SEQ",String,"SEQ")
+'Variable.UDT.uWorkOrder.Define("QTY_ON_LABEL",Float,"QTY_ON_LABEL")
+'Variable.UDT.uWorkOrder.Define("LBL_CREATE_DATE",Date,"LBL_CREATE_DATE")
+'Variable.UDT.uWorkOrder.Define("PART",String,"PART")
+'Variable.UDT.uWorkOrder.Define("REV",String,"REV")
+'Variable.UDT.uWorkOrder.Define("LOCN",String,"LOCN")
+'Variable.UDT.uWorkOrder.Define("QTY_ON_ORDER",Float,"QTY_ON_ORDER")
+'Variable.UDT.uWorkOrder.Define("DESCR",String,"DESCR")
+'Variable.UDT.uWorkOrder.Define("INV_UM",String,"INV_UM")
+'Variable.UDT.uWorkOrder.Define("DRAWING",String,"DRAWING")
+'Variable.UDT.uWorkOrder.Define("CUSTOMER",String,"CUSTOMER_NBR")
+'Variable.UDT.uWorkOrder.Define("CUSTOMER_NAME",String,"CUSTOMER_NAME")
+'Variable.UDT.uWorkOrder.Define("CUSTOMER_PO",String,"CUSTOMER_PO")
+'Variable.UDT.uWorkOrder.Define("CUSTOMER_PART",String,"CUSTOMER_PART")
+'Variable.UDT.uWorkOrder.Define("PROM_DATE",Date,"PROM_DATE")
+'Variable.UDT.uWorkOrder.Define("SO",String,"SO")
+'Variable.UDT.uWorkOrder.Define("SO_LINE",String,"SO_LINE")
+'Variable.UDT.uWorkOrder.Define("SHIP_ID",String,"SHIP_ID")
+'Variable.UDT.uWorkOrder.Define("QTY_ORDERED",Float,"QTY_ORDERED")
+'Variable.UDT.uWorkOrder.Define("QTY_SHIPPED",Float,"QTY_SHIPPED")
+'Variable.UDT.uWorkOrder.Define("QTY_BO",Float,"QTY_BO")
+'Variable.UDT.uWorkOrder.Define("WEIGHT",Float,"WEIGHT")
+'Variable.UDT.uWorkOrder.Define("LN_PRICE",Float,"LN_PRICE")
+'Variable.UDT.uWorkOrder.Define("LN_COST",Float,"LN_COST")
+'Variable.UDT.uWorkOrder.Define("LN_DISCOUNT_PRICE",Float,"LN_DISCOUNT_PRICE")
+'Variable.UDT.uWorkOrder.Define("SHIP_INTL_ADDRS",String,"SHIP_INTL_ADDRS")
+'Variable.UDT.uWorkOrder.Define("SHIP_NAME",String,"SHIP_NAME")
+'Variable.UDT.uWorkOrder.Define("SHIP_ADDRS1",String,"SHIP_ADDRS1")
+'Variable.UDT.uWorkOrder.Define("SHIP_ADDRS2",String,"SHIP_ADDRS2")
+'Variable.UDT.uWorkOrder.Define("SHIP_ADDRS3",String,"SHIP_ADDRS3")
+'Variable.UDT.uWorkOrder.Define("SHIP_ADDRS4",String,"SHIP_ADDRS4")
+'Variable.UDT.uWorkOrder.Define("SHIP_ADDRS5",String,"SHIP_ADDRS5")
+'Variable.UDT.uWorkOrder.Define("SHIP_CITY",String,"SHIP_CITY")
+'Variable.UDT.uWorkOrder.Define("SHIP_STATE",String,"SHIP_STATE")
+'Variable.UDT.uWorkOrder.Define("SHIP_ZIP",String,"SHIP_ZIP")
+'Variable.UDT.uWorkOrder.Define("SHIP_COUNTRY",String,"SHIP_COUNTRY")
+'Variable.UDT.uWorkOrder.Define("SHIP_ATTN",String,"SHIP_ATTN")
+'Variable.UDT.uWorkOrder.Define("OH_USER1",String,"OH_USER1")
+'Variable.UDT.uWorkOrder.Define("OH_USER2",String,"OH_USER2")
+'Variable.UDT.uWorkOrder.Define("OH_USER3",String,"OH_USER3")
+'Variable.UDT.uWorkOrder.Define("OH_USER4",String,"OH_USER4")
+'Variable.UDT.uWorkOrder.Define("OH_USER5",String,"OH_USER5")
+'Variable.UDT.uWorkOrder.Define("OL_USER1",String,"OL_USER1")
+'Variable.UDT.uWorkOrder.Define("OL_USER2",String,"OL_USER2")
+'Variable.UDT.uWorkOrder.Define("OL_USER3",String,"OL_USER3")
+'Variable.UDT.uWorkOrder.Define("OL_USER4",String,"OL_USER4")
+'Variable.UDT.uWorkOrder.Define("OL_USER5",String,"OL_USER5")
+'Variable.UDT.uWorkOrder.Define("DATE1",Date,"DATE1")
+'Variable.UDT.uWorkOrder.Define("DATE2",Date,"DATE2")
+'Variable.UDT.uWorkOrder.Define("BATCH1",String,"BATCH1")
+'Variable.UDT.uWorkOrder.Define("BATCH2",String,"BATCH2")
+'Variable.UDT.uWorkOrder.Define("SHIP_DATE",Date,"SHIP_DATE")
+'Variable.UDT.uWorkOrder.Define("COMMENT1",String,"COMMENT1")
+'Variable.UDT.uWorkOrder.Define("COMMENT2",String,"COMMENT2")
+'Variable.UDT.uWorkOrder.Define("COMMENT3",String,"COMMENT3")
+'Variable.UDT.uWorkOrder.Define("COMMENT4",String,"COMMENT4")
+'Variable.UDT.uWorkOrder.Define("COMMENT5",String,"COMMENT5")
+'Variable.UDT.uWorkOrder.Define("BATCH1_TITLE",String,"BATCH1_TITLE")
+'Variable.UDT.uWorkOrder.Define("BATCH2_TITLE",String,"BATCH2_TITLE")
+'Variable.UDT.uWorkOrder.Define("DATE1_TITLE",String,"DATE1_TITLE")
+'Variable.UDT.uWorkOrder.Define("DATE2_TITLE",String,"DATE2_TITLE")
+'Variable.UDT.uWorkOrder.Define("COMMENT1_TITLE",String,"COMMENT1_TITLE")
+'Variable.UDT.uWorkOrder.Define("COMMENT2_TITLE",String,"COMMENT2_TITLE")
+'Variable.UDT.uWorkOrder.Define("COMMENT3_TITLE",String,"COMMENT3_TITLE")
+'Variable.UDT.uWorkOrder.Define("COMMENT4_TITLE",String,"COMMENT4_TITLE")
+'Variable.UDT.uWorkOrder.Define("COMMENT5_TITLE",String,"COMMENT5_TITLE")
+'Variable.UDT.uWorkOrder.Define("C_EXTERNAL_ID",String,"C_EXTERNAL_ID")
+'Variable.UDT.uWorkOrder.Define("ALT_DESC_1",String,"ALT_DESC_1")
+'Variable.UDT.uWorkOrder.Define("ALT_DESC_2",String,"ALT_DESC_2")
+'Variable.uGlobal.uWorkOrder.Declare("uWorkOrder")
+Variable.Global.bSentinel.Declare(Boolean,False)
+Program.Sub.Preflight.End
+
+Program.Sub.Main.Start
+'ARC: 6542
+'Customer: Nordic Hot Tubs 
+'Modifying preprocessor for Work order labels to route appropriate info and print from correct printer/configuration based on what customer they are trying to print a label for 
+'Author: Brandon Medina 
+'Start: 11/8/21
+F.Intrinsic.Control.SetErrorHandler("Main_Err")
+F.Intrinsic.Control.ClearErrors
+
+V.Local.sError.Declare(String)
+
+
+'F.ODBC.Connection!con.OpenCompanyConnection(V.Ambient.PDSN,V.Ambient.PUser,V.Ambient.PPass)
+F.ODBC.Connection!con.OpenCompanyConnection
+F.Intrinsic.Control.CallSub(Loaddata)
+
+F.Intrinsic.Control.ExitSub
+
+F.Intrinsic.Control.Label("Main_Err")
+F.Intrinsic.Control.If(V.Ambient.ErrorNumber,<>,0)
+    Function.Intrinsic.String.Concat("Project: GCG_6542_PrinterSelectionPreProc.g2u",V.Ambient.Newline,V.Ambient.Newline,"Subroutine: ",V.Ambient.CurrentSubroutine,V.Ambient.NewLine,"Error Occurred ",V.Ambient.ErrorNumber," with description ",V.Ambient.ErrorDescription,V.Local.sError)
+    F.Intrinsic.UI.Msgbox(V.Local.sError)
+    F.Intrinsic.Control.CallSub(Unload)
+Function.Intrinsic.Control.EndIf
+
+Program.Sub.Main.End
+
+Program.Sub.Unload.Start
+F.Intrinsic.Control.SetErrorHandler("Unload_Err")
+F.Intrinsic.Control.ClearErrors
+
+V.Local.sError.Declare(String)
+
+F.ODBC.Connection!con.Close
+F.Intrinsic.Control.End
+
+F.Intrinsic.Control.ExitSub
+
+F.Intrinsic.Control.Label("Unload_Err")
+F.Intrinsic.Control.If(V.Ambient.ErrorNumber,<>,0)
+    Function.Intrinsic.String.Concat("Project: GCG_6542_PrinterSelectionPreProc.g2u",V.Ambient.Newline,V.Ambient.Newline,"Subroutine: ",V.Ambient.CurrentSubroutine,V.Ambient.NewLine,"Error Occurred ",V.Ambient.ErrorNumber," with description ",V.Ambient.ErrorDescription,V.Local.sError)
+    F.Intrinsic.UI.Msgbox(V.Local.sError)
+    F.Intrinsic.Control.End
+Function.Intrinsic.Control.EndIf
+Program.Sub.Unload.End
+
+Program.Sub.LoadData.Start
+F.Intrinsic.Control.SetErrorHandler("LoadData_Err")
+F.Intrinsic.Control.ClearErrors
+
+V.Local.sError.Declare(String)
+V.Local.sSql.Declare(String)
+V.Local.iUB.Declare(Long)
+v.Local.i.Declare(Long)
+v.Local.fieldMap.Declare(String)
+V.Local.sLabelPath.Declare
+V.Local.bWrongRecord.Declare(Boolean, False)
+
+'***ANY CHANGES MADE HERE MUST ALSO BE MADE TO GCG_6542_SFDCPrint.g2u as part of the added SFDC.net print functionality***
+
+'Getting run ID passed down
+V.Global.iBIRunID.Set(V.Passed.DATA-GAB-0)
+'Getting log ID passed down
+V.Global.iBILogID.Set(V.Passed.DATA-GAB-1)
+
+'Getting Sentinel flag passed down
+Variable.Global.bSentinel.Set(Variable.Passed.DATA-GAB-2)
+
+'Y_SF_WORKORD: Y (To know which WO was selected for printing)
+'ORDER_TO_WO: OW (Est link between WO > SO)
+'ORDER_CONFIG: O (Filter corresponding SO and PARENT_IDENTIFIER by info you want e.g. SYSSQUARE etc & get part) 
+'INV_EXTRA: I (From part, look at corresponding user fields to get label info)
+'CUSTOMER_MASTER: C Grab international flag to determine which labels to print
+'JOB_SERIAL: J Based on selected WO, grab the serial number from here 
+
+'Loading data from Y table, as being label being printed from Menu, Selecting all fields as all fields are transferred over from Y table to Z table
+'F.Intrinsic.String.Build("Select * From Y_SF_WORKORD where RUNID = {0}",V.Global.iBIRunID,V.Local.sSql)
+
+	
+	', I.USER_2 as VOLT, I.USER_3 as AMP, I.USER_4 as HZ, I.USER_7 as COLOR, I.USER_8 as CABINET
+'BM Add to Y table the associated Sales order. Also add serial number column. Need to trim leading 0 in main query above, that is not in JOB_SERIAL table. 
+'F.Intrinsic.String.Build("select Y.*, OW.ORDER_NO, OW.ORDER_LINE, (OW.ORDER_NO + OW.ORDER_LINE) as MATCH, C.INTL_ADDR from Y_SF_WORKORD Y left join V_ORDER_TO_WO OW on Y.WO = OW.JOB and Y.WO_SUFFIX = OW.SUFFIX left join V_CUSTOMER_MASTER C on C.CUSTOMER = Y.CUSTOMER_NBR where RUNID = {0}", V.Global.iBIRunID, V.Local.sSql)
+F.Intrinsic.String.Build("select Y.*, OW.ORDER_NO, OW.ORDER_LINE, (OW.ORDER_NO + OW.ORDER_LINE) as MATCH, C.INTL_ADDR, J.SERIAL_START as SERIAL from Y_SF_WORKORD Y left join V_ORDER_TO_WO OW on Y.WO = OW.JOB and Y.WO_SUFFIX = OW.SUFFIX left join V_CUSTOMER_MASTER C on C.CUSTOMER = Y.CUSTOMER_NBR left join V_JOB_SERIAL J on right(J.JOB, 6) = OW.JOB where RUNID = {0}", V.Global.iBIRunID, V.Local.sSql)
+'BM FOR TESTING 
+'V.Local.sSql.Set("select Y.*, OW.ORDER_NO, OW.ORDER_LINE, (OW.ORDER_NO + OW.ORDER_LINE) as MATCH, C.INTL_ADDR, J.SERIAL_START as SERIAL from Y_SF_WORKORD Y left join V_ORDER_TO_WO OW on Y.WO = OW.JOB and Y.WO_SUFFIX = OW.SUFFIX left join V_CUSTOMER_MASTER C on C.CUSTOMER = Y.CUSTOMER_NBR left join V_JOB_SERIAL J on right(J.JOB, 6) = OW.JOB")
+F.Data.DataTable.CreateFromSQL("dtPreWOL", "con", V.Local.sSQL)
+F.Data.DataView.Create("dtPreWOL", "dvWOL", 22)
+F.Data.DataView.ToDataTableDistinct("dtPreWOL", "dvWOL", "dtWOL", "WO*!*WO_SUFFIX*!*MATCH*!*PART*!*DESCR*!*SERIAL*!*CUSTOMER_NBR*!*CUSTOMER_NAME*!*SO*!*SO_LINE*!*INTL_ADDR")
+F.Data.DataTable.Close("dtPreWOL")
+
+'BM Create new columns with info for labels.
+F.Data.DataTable.AddColumn("dtWOL", "VOLT", "String")
+F.Data.DataTable.AddColumn("dtWOL", "AMP", "String")
+F.Data.DataTable.AddColumn("dtWOL", "HZ", "String")
+F.Data.DataTable.AddColumn("dtWOL", "POWER", "String")
+F.Data.DataTable.AddColumn("dtWOL", "COLOR", "String")
+F.Data.DataTable.AddColumn("dtWOL", "CABINET", "String")
+F.Data.DataTable.AddColumn("dtWOL", "TITLE", "String")
+
+'BM Create criteria for Volt, Amp, power, and Hz dictionaries
+'Change to scope. Not using syssquare or sysround, using ASBLM% in Idenfifier column 
+'F.Intrinsic.String.Build("select ORDER_NO + ORDER_LINE as MATCH, IDENTIFIER as PART from V_ORDER_CONFIG where ORDER_NO = '{0}' and ORDER_LINE = '{1}' and (PARENT_IDENTIFIER = 'SYSSQUARE' or PARENT_IDENTIFIER = 'SYSROUND')", V.DataTable.dtWOL(0).ORDER_NO!FieldVal, V.DataTable.dtWOL(0).ORDER_LINE!FieldVal, V.Local.sSql)
+F.Intrinsic.String.Build("select ORDER_NO + ORDER_LINE as MATCH, IDENTIFIER as PART from V_ORDER_CONFIG where ORDER_NO = '{0}' and ORDER_LINE = '{1}' and IDENTIFIER like 'ASBL%'", V.DataTable.dtWOL(0).ORDER_NO!FieldVal, V.DataTable.dtWOL(0).ORDER_LINE!FieldVal, V.Local.sSql)
+F.Data.DataTable.CreateFromSQL("dtPrePhysMatch", "con", V.Local.sSql)
+
+'BM error in NOrdic's system where some IDs are not set up right (ends w asbl instead of starting). This will catch those instances and warn user 
+'F.Intrinsic.Control.If(V.DataTable.dtPrePhysMatch.RowCount, <, 1)
+'	F.Data.DataTable.Close("dtPrePhysMatch")
+'	F.Intrinsic.String.Build("select ORDER_NO + ORDER_LINE as MATCH, IDENTIFIER as PART from V_ORDER_CONFIG where ORDER_NO = '{0}' and ORDER_LINE = '{1}' and IDENTIFIER like '%ASBL'", V.DataTable.dtWOL(0).ORDER_NO!FieldVal, V.DataTable.dtWOL(0).ORDER_LINE!FieldVal, V.Local.sSql)
+'	F.Data.DataTable.CreateFromSQL("dtPrePhysMatch", "con", V.Local.sSQL)
+'	V.Local.bWrongRecord.Set(True)
+'F.Intrinsic.Control.EndIf
+F.Intrinsic.Control.If(V.DataTable.dtPrePhysMatch.RowCount, <, 1)
+	F.Data.DataTable.Close("dtPrePhysMatch")
+	F.Intrinsic.String.Build("select ORDER_NO + ORDER_LINE as MATCH, IDENTIFIER as PART from V_ORDER_CONFIG where ORDER_NO = '{0}' and ORDER_LINE = '{1}' and IDENTIFIER like '%ASBL'", V.DataTable.dtWOL(0).ORDER_NO!FieldVal, V.DataTable.dtWOL(0).ORDER_LINE!FieldVal, V.Local.sSql)
+	F.Data.DataTable.CreateFromSQL("dtPrePhysMatch", "con", V.Local.sSQL)
+	'BM Account for situation where user wants to reprint label that has already been shipped/invoiced (or partially). If completely shipped, will not be in ORDER_CONFIG will instead be in CONFIG_LN_HIST, so look there. If not there then error
+	F.Intrinsic.Control.If(V.DataTable.dtPrePhysMatch.RowCount, <, 1)
+		F.Data.DataTable.Close("dtPrePhysMatch")
+		F.Intrinsic.String.Build("select ORDER_NO + ORDER_LINE as MATCH, IDENTIFIER as PART from CONFIG_LN_HIST where ORDER_NO = '{0}' and ORDER_LINE = '{1}' and IDENT like 'ASBL%'", V.DataTable.dtWOL(0).ORDER_NO!FieldVal, V.DataTable.dtWOL(0).ORDER_LINE!FieldVal, V.Local.sSql)
+		F.Data.DataTable.CreateFromSQL("dtPrePhysMatch", "con", V.Local.sSQL)
+		'Check history for instance where they have the IDENTIFIER as ASBL
+		F.Intrinsic.Control.If(V.DataTable.dtPrePhysMatch.RowCount, <, 1)
+			F.Data.DataTable.Close("dtPrePhysMatch")
+			F.Intrinsic.String.Build("select ORDER_NO + ORDER_LINE as MATCH, IDENTIFIER as PART from CONFIG_LN_HIST where ORDER_NO = '{0}' and ORDER_LINE = '{1}' and IDENT like '%ASBL'", V.DataTable.dtWOL(0).ORDER_NO!FieldVal, V.DataTable.dtWOL(0).ORDER_LINE!FieldVal, V.Local.sSql)
+			F.Data.DataTable.CreateFromSQL("dtPrePhysMatch", "con", V.Local.sSQL)
+			F.Intrinsic.Control.If(V.DataTable.dtPrePhysMatch.RowCount, >, 0)
+				V.Local.bWrongRecord.Set(True)
+			F.Intrinsic.Control.EndIf
+		F.Intrinsic.Control.EndIf
+	F.Intrinsic.Control.Else
+		V.Local.bWrongRecord.Set(True)
+	F.Intrinsic.Control.EndIf
+F.Intrinsic.Control.EndIf
+
+F.Data.DataView.Create("dtPrePhysMatch", "dvPrePhysMatch", 22)
+F.Data.DataView.ToDataTableDistinct("dtPrePhysMatch", "dvPrePhysMatch", "dtPhysMatch", "MATCH*!*PART")
+F.Intrinsic.Control.If(V.DataTable.dtPhysMatch.RowCount, <, 1)
+	F.Intrinsic.UI.Msgbox("No voltage, current, or cycle configurator options were found for selected work order and/or corresponding sales order.")
+	F.Intrinsic.Control.End
+F.Intrinsic.Control.ElseIf(V.Local.bWrongRecord)
+	F.Intrinsic.UI.Msgbox("Voltage, current, and cycle configuration options were found, but part is set up wrong (ends with ASBL rather than starting).", "Warning")
+F.Intrinsic.Control.EndIf
+
+'BM Create Volt, Amp, Hz dictionaries
+'F.Intrinsic.String.Build("select IDENTIFIER as PART, USER2 as VOLT from INV_EXTRA where PART = '{0}'", V.DataTable.dtPhysMatch(0).PART!FieldVal, V.Local.sSql)
+F.Intrinsic.String.Build("select '{0}{1}' as MATCH, USER2 as VOLT from INV_EXTRA where PART = '{2}'", V.DataTable.dtWOL(0).ORDER_NO!FieldVal, V.DataTable.dtWOL(0).ORDER_LINE!FieldVal, V.DataTable.dtPhysMatch(0).PART!FieldValTrim, V.Local.sSql)
+F.Data.Dictionary.CreateFromSQL("dictVolt", "con", V.Local.sSql)
+F.Intrinsic.String.Build("select '{0}{1}' as MATCH, USER3 as AMP from INV_EXTRA where PART = '{2}'", V.DataTable.dtWOL(0).ORDER_NO!FieldVal, V.DataTable.dtWOL(0).ORDER_LINE!FieldVal, V.DataTable.dtPhysMatch(0).PART!FieldValTrim, V.Local.sSql)
+F.Data.Dictionary.CreateFromSQL("dictAmp", "con", V.Local.sSql)
+F.Intrinsic.String.Build("select '{0}{1}' as MATCH, USER6 as POWER from INV_EXTRA where PART = '{2}'", V.DataTable.dtWOL(0).ORDER_NO!FieldVal, V.DataTable.dtWOL(0).ORDER_LINE!FieldVal, V.DataTable.dtPhysMatch(0).PART!FieldValTrim, V.Local.sSql)
+F.Data.Dictionary.CreateFromSQL("dictPower", "con", V.Local.sSql)
+F.Intrinsic.String.Build("select '{0}{1}' as MATCH, USER4 as HZ from INV_EXTRA where PART = '{2}'", V.DataTable.dtWOL(0).ORDER_NO!FieldVal, V.DataTable.dtWOL(0).ORDER_LINE!FieldVal, V.DataTable.dtPhysMatch(0).PART!FieldValTrim, V.Local.sSql)
+F.Data.Dictionary.CreateFromSQL("dictHz", "con", V.Local.sSql)
+F.Data.DataTable.Close("dtPrePhysMatch")
+F.Data.DataTable.Close("dtPhysMatch")
+
+'BM Create criteria for Color dictionary 
+F.Intrinsic.String.Build("select ORDER_NO + ORDER_LINE as MATCH, IDENTIFIER as PART from V_ORDER_CONFIG where ORDER_NO = '{0}' and ORDER_LINE = '{1}' and PARENT_IDENTIFIER like 'SHELL%'", V.DataTable.dtWOL(0).ORDER_NO!FieldVal, V.DataTable.dtWOL(0).ORDER_LINE!FieldVal, V.Local.sSql)
+F.Data.DataTable.CreateFromSQL("dtPrePhysMatch", "con", V.Local.sSql)
+'F.Data.DataView.Create("dtPrePhysMatch", "dvPrePhysMatch", 22)
+'F.Data.DataView.ToDataTableDistinct("dtPrePhysMatch", "dvPrePhysMatch", "dtPhysMatch", "MATCH*!*PART")
+F.Intrinsic.Control.If(V.DataTable.dtPrePhysMatch.RowCount, <, 1)
+	F.Data.DataTable.Close("dtPrePhysMatch")
+	'Account for reprint label situation
+	F.Intrinsic.String.Build("select ORDER_NO + ORDER_LINE as MATCH, IDENT as PART from CONFIG_LN_HIST where ORDER_NO = '{0}' and ORDER_LINE = '{1}' and PARENT_IDENT like 'SHELL%'", V.DataTable.dtWOL(0).ORDER_NO!FieldVal, V.DataTable.dtWOL(0).ORDER_LINE!FieldVal, V.Local.sSql)
+	F.Data.DataTable.CreateFromSQL("dtPrePhysMatch", "con", V.Local.sSql)
+	F.Intrinsic.Control.If(V.DataTable.dtPrePhysMatch.RowCount, <, 1)
+		F.Intrinsic.UI.Msgbox("No color configurator options were found for selected work order and/or corresponding sales order.")
+		F.Intrinsic.Control.End
+	F.Intrinsic.Control.EndIf
+F.Intrinsic.Control.EndIf
+F.Data.DataView.Create("dtPrePhysMatch", "dvPrePhysMatch", 22)
+F.Data.DataView.ToDataTableDistinct("dtPrePhysMatch", "dvPrePhysMatch", "dtPhysMatch", "MATCH*!*PART")
+'BM Create Color dictionary
+F.Intrinsic.String.Build("select '{0}{1}' as MATCH, USER7 as COLOR from INV_EXTRA where PART = '{2}'", V.DataTable.dtWOL(0).ORDER_NO!FieldVal, V.DataTable.dtWOL(0).ORDER_LINE!FieldVal, V.DataTable.dtPhysMatch(0).PART!FieldValTrim, V.Local.sSql)
+F.Data.Dictionary.CreateFromSQL("dictColor", "con", V.Local.sSql)
+F.Data.DataTable.Close("dtPrePhysMatch")
+F.Data.DataTable.Close("dtPhysMatch")
+
+
+'BM Create criteria for Cabinet Dictionary 
+F.Intrinsic.String.Build("select ORDER_NO + ORDER_LINE as MATCH, IDENTIFIER as PART from V_ORDER_CONFIG where ORDER_NO = '{0}' and ORDER_LINE = '{1}' and PARENT_IDENTIFIER like 'PANEL%'", V.DataTable.dtWOL(0).ORDER_NO!FieldVal, V.DataTable.dtWOL(0).ORDER_LINE!FieldVal, V.Local.sSql)
+F.Data.DataTable.CreateFromSQL("dtPrePhysMatch", "con", V.Local.sSql)
+'F.Data.DataView.Create("dtPrePhysMatch", "dvPrePhysMatch", 22)
+'F.Data.DataView.ToDataTableDistinct("dtPrePhysMatch", "dvPrePhysMatch", "dtPhysMatch", "MATCH*!*PART")
+F.Intrinsic.Control.If(V.DataTable.dtPrePhysMatch.RowCount, <, 1)
+	F.Data.DataTable.Close("dtPrePhysMatch")
+	'Account for reprint label situation
+	F.Intrinsic.String.Build("select ORDER_NO + ORDER_LINE as MATCH, IDENT as PART from CONFIG_LN_HIST where ORDER_NO = '{0}' and ORDER_LINE = '{1}' and PARENT_IDENT like 'PANEL%'", V.DataTable.dtWOL(0).ORDER_NO!FieldVal, V.DataTable.dtWOL(0).ORDER_LINE!FieldVal, V.Local.sSql)
+	F.Data.DataTable.CreateFromSQL("dtPrePhysMatch", "con", V.Local.sSql)
+	F.Intrinsic.Control.If(V.DataTable.dtPrePhysMatch.RowCount, <, 1)
+		F.Intrinsic.UI.Msgbox("No cabinet configurator options were found for selected work order and/or corresponding sales order.")
+		F.Intrinsic.Control.End
+	F.Intrinsic.Control.EndIf
+F.Intrinsic.Control.EndIf
+F.Data.DataView.Create("dtPrePhysMatch", "dvPrePhysMatch", 22)
+F.Data.DataView.ToDataTableDistinct("dtPrePhysMatch", "dvPrePhysMatch", "dtPhysMatch", "MATCH*!*PART")
+'BM Create Cabinet Dictionary 
+F.Intrinsic.String.Build("select '{0}{1}' as MATCH, USER8 as CABINET from INV_EXTRA where PART = '{2}'", V.DataTable.dtWOL(0).ORDER_NO!FieldVal, V.DataTable.dtWOL(0).ORDER_LINE!FieldVal, V.DataTable.dtPhysMatch(0).PART!FieldValTrim, V.Local.sSql)
+F.Data.Dictionary.CreateFromSQL("dictCabinet", "con", V.Local.sSql)
+F.Data.DataTable.Close("dtPrePhysMatch")
+F.Data.DataTable.Close("dtPhysMatch")
+
+'BM Create criteria for Title Dictionary 
+F.Intrinsic.String.Build("select ORDER_NO + ORDER_LINE as MATCH, IDENTIFIER as PART from V_ORDER_CONFIG where ORDER_NO = '{0}' and ORDER_LINE = '{1}' and PARENT_IDENTIFIER like 'INS%'", V.DataTable.dtWOL(0).ORDER_NO!FieldVal, V.DataTable.dtWOL(0).ORDER_LINE!FieldVal, V.Local.sSql)
+F.Data.DataTable.CreateFromSQL("dtPrePhysMatch", "con", V.Local.sSql)
+'F.Data.DataView.Create("dtPrePhysMatch", "dvPrePhysMatch", 22)
+'F.Data.DataView.ToDataTableDistinct("dtPrePhysMatch", "dvPrePhysMatch", "dtPhysMatch", "MATCH*!*PART")
+F.Intrinsic.Control.If(V.DataTable.dtPrePhysMatch.RowCount, <, 1)
+	F.Data.DataTable.Close("dtPrePhysMatch")
+	'Account for reprint label situation
+	F.Intrinsic.String.Build("select ORDER_NO + ORDER_LINE as MATCH, IDENT as PART from CONFIG_LN_HIST where ORDER_NO = '{0}' and ORDER_LINE = '{1}' and PARENT_IDENT like 'INS%'", V.DataTable.dtWOL(0).ORDER_NO!FieldVal, V.DataTable.dtWOL(0).ORDER_LINE!FieldVal, V.Local.sSql)
+	F.Data.DataTable.CreateFromSQL("dtPrePhysMatch", "con", V.Local.sSql)
+	F.Intrinsic.Control.If(V.DataTable.dtPrePhysMatch.RowCount, <, 1)
+		F.Intrinsic.UI.Msgbox("No title 20 configurator options were found for selected work order and/or corresponding sales order.")
+		F.Intrinsic.Control.End
+	F.Intrinsic.Control.EndIf
+F.Intrinsic.Control.EndIf
+F.Data.DataView.Create("dtPrePhysMatch", "dvPrePhysMatch", 22)
+F.Data.DataView.ToDataTableDistinct("dtPrePhysMatch", "dvPrePhysMatch", "dtPhysMatch", "MATCH*!*PART")
+'BM Create Title Dictionary 
+F.Intrinsic.String.Build("select '{0}{1}' as MATCH, USER9 as TITLE from INV_EXTRA where PART = '{2}'", V.DataTable.dtWOL(0).ORDER_NO!FieldVal, V.DataTable.dtWOL(0).ORDER_LINE!FieldVal, V.DataTable.dtPhysMatch(0).PART!FieldValTrim, V.Local.sSql)
+F.Data.Dictionary.CreateFromSQL("dictTitle", "con", V.Local.sSql)
+F.Data.DataTable.Close("dtPrePhysMatch")
+F.Data.DataTable.Close("dtPhysMatch")
+
+'Fill columns 
+F.Data.Dictionary.SetDefaultReturn("dictVolt", "")
+F.Data.Dictionary.SetDefaultReturn("dictAmp", "")
+F.Data.Dictionary.SetDefaultReturn("dictPower", "")
+F.Data.Dictionary.SetDefaultReturn("dictHz", "")
+F.Data.Dictionary.SetDefaultReturn("dictColor", "")
+F.Data.Dictionary.SetDefaultReturn("dictCabinet", "")
+F.Data.Dictionary.SetDefaultReturn("dictTitle", "")
+
+F.Data.DataTable.FillFromDictionary("dtWOL", "dictVolt", "MATCH", "VOLT")
+F.Data.DataTable.FillFromDictionary("dtWOL", "dictAmp", "MATCH", "AMP")
+F.Data.DataTable.FillFromDictionary("dtWOL", "dictPower", "MATCH", "POWER")
+F.Data.DataTable.FillFromDictionary("dtWOL", "dictHz", "MATCH", "HZ")
+F.Data.DataTable.FillFromDictionary("dtWOL", "dictColor", "MATCH", "COLOR")
+F.Data.DataTable.FillFromDictionary("dtWOL", "dictCabinet", "MATCH", "CABINET")
+F.Data.DataTable.FillFromDictionary("dtWOL", "dictTitle", "MATCH", "TITLE")
+
+F.Data.Dictionary.Close("dictVolt")
+F.Data.Dictionary.Close("dictAmp")
+F.Data.Dictionary.Close("dictPower")
+F.Data.Dictionary.Close("dictHz")
+F.Data.Dictionary.Close("dictColor")
+F.Data.Dictionary.Close("dictCabinet")
+F.Data.Dictionary.Close("dictTitle")
+
+'Remove match column
+F.Data.DataTable.RemoveColumn("dtWOL", "MATCH")
+
+f.Intrinsic.Control.If(v.DataTable.dtWOL.RowCount,>,-1)
+    'Checking to see if sequence being printed is Codesoft label
+    Function.Intrinsic.Control.If(Variable.Global.bSentinel,=,True)
+        'add expression columns for the 2 mismatched columns named from the Y and Z table links.
+		F.Data.DataTable.AddExpressionColumn("dtWOL","CUSTOMER","String","IIF([CUSTOMER_NBR] = '','',CUSTOMER_NBR)")
+		F.Data.DataTable.AddExpressionColumn("dtWOL","BIRUNID","Long","IIF([RUNID] <= -1,'0',[RUNID])")	
+		
+		'Stopping Logging
+		F.Global.BI.StopLogging(V.Global.iBILogID)
+        'Printing Codesoft label
+        'f.Global.BI.PrintCodesoftLabelFromDataTable(V.Global.iBIRunID,V.Global.iBILogID,"dtWOL","",true)
+         'BM Change to hardcode printer name 
+        'BM ADD CODESOFT FILE NAMES 
+        F.Intrinsic.String.Build("{0}\LABELS\Custom\SF_WIP_FG_1835_WARNING.lab", V.Caller.BusintDir, V.Local.sLabelPath)
+	    F.Global.BI.PrintCodesoftLabelFromDataTable(-1, 1, "dtWOL", "WARNING LABEL", True, V.Local.sLabelPath, True)
+        'Determine if customer is international and use the right version based on that 
+        F.Intrinsic.Control.If(V.DataTable.dtWOL(0).INTL_ADDR!FieldValTrim, =, "Y")
+        	F.Intrinsic.String.Build("{0}\LABELS\Custom\SF_WIP_FG_1835_BAG_EE.lab", V.Caller.BusintDir, V.Local.sLabelPath)
+	        F.Global.BI.PrintCodesoftLabelFromDataTable(-1, 1, "dtWOL", "BAG LABEL", True, V.Local.sLabelPath, True)
+	        F.Intrinsic.String.Build("{0}\LABELS\Custom\SF_WIP_FG_1835_CERT_EE.lab", V.Caller.BusintDir, V.Local.sLabelPath)
+	        F.Global.BI.PrintCodesoftLabelFromDataTable(-1, 1, "dtWOL", "CERTIFICATION LABEL", True, V.Local.sLabelPath, True)
+	        F.Intrinsic.String.Build("{0}\LABELS\Custom\SF_WIP_FG_1835_SERIAL_EE.lab", V.Caller.BusintDir, V.Local.sLabelPath)
+	        F.Global.BI.PrintCodesoftLabelFromDataTable(-1, 1, "dtWOL", "SERIAL LABEL", True, V.Local.sLabelPath, True)
+        F.Intrinsic.Control.Else
+        	F.Intrinsic.String.Build("{0}\LABELS\Custom\SF_WIP_FG_1835_BAG.lab", V.Caller.BusintDir, V.Local.sLabelPath)
+	        F.Global.BI.PrintCodesoftLabelFromDataTable(-1, 1, "dtWOL", "BAG LABEL", True, V.Local.sLabelPath, True)
+	        F.Intrinsic.String.Build("{0}\LABELS\Custom\SF_WIP_FG_1835_CERT.lab", V.Caller.BusintDir, V.Local.sLabelPath)
+	        F.Global.BI.PrintCodesoftLabelFromDataTable(-1, 1, "dtWOL", "CERTIFICATION LABEL", True, V.Local.sLabelPath, True)
+	        F.Intrinsic.String.Build("{0}\LABELS\Custom\SF_WIP_FG_1835_SERIAL.lab", V.Caller.BusintDir, V.Local.sLabelPath)
+	        F.Global.BI.PrintCodesoftLabelFromDataTable(-1, 1, "dtWOL", "SERIAL LABEL", True, V.Local.sLabelPath, True)
+        F.Intrinsic.Control.EndIf    
+    Function.Intrinsic.Control.Else       
+        'Opening table and writing data out for Crystal
+        v.Local.fieldMap.Set("RUNID@!@BIRUNID*!*WO@!@WO*!*WO_SUFFIX@!@WO_SUFFIX*!*SEQ@!@SEQ*!*QTY_ON_LABEL@!@QTY_ON_LABEL*!*LBL_CREATE_DATE@!@LBL_CREATE_DATE*!*PART@!@PART*!*REV@!@REV*!*LOCN@!@LOCN*!*QTY_ON_ORDER@!@QTY_ON_ORDER*!*DESCR@!@DESCR*!*INV_UM@!@INV_UM*!*DRAWING@!@DRAWING*!*CUSTOMER_NBR@!@CUSTOMER*!*CUSTOMER_NAME@!@CUSTOMER_NAME*!*CUSTOMER_PO@!@CUSTOMER_PO*!*CUSTOMER_PART@!@CUSTOMER_PART*!*PROM_DATE@!@PROM_DATE*!*SO@!@SO*!*SO_LINE@!@SO_LINE*!*SHIP_ID@!@SHIP_ID*!*QTY_ORDERED@!@QTY_ORDERED*!*QTY_SHIPPED@!@QTY_SHIPPED*!*QTY_BO@!@QTY_BO*!*WEIGHT@!@WEIGHT*!*LN_PRICE@!@LN_PRICE*!*LN_COST@!@LN_COST*!*SHIP_INTL_ADDRS@!@SHIP_INTL_ADDRS*!*SHIP_NAME@!@SHIP_NAME*!*SHIP_ADDRS1@!@SHIP_ADDRS1*!*SHIP_ADDRS2@!@SHIP_ADDRS2*!*SHIP_ADDRS3@!@SHIP_ADDRS3*!*SHIP_ADDRS4@!@SHIP_ADDRS4*!*SHIP_ADDRS5@!@SHIP_ADDRS5*!*SHIP_CITY@!@SHIP_CITY*!*SHIP_STATE@!@SHIP_STATE*!*SHIP_ZIP@!@SHIP_ZIP*!*SHIP_COUNTRY@!@SHIP_COUNTRY*!*SHIP_ATTN@!@SHIP_ATTN*!*OH_USER1@!@OH_USER1*!*OH_USER2@!@OH_USER2*!*OH_USER3@!@OH_USER3*!*OH_USER4@!@OH_USER4*!*OH_USER5@!@OH_USER5*!*OL_USER1@!@OL_USER1*!*OL_USER2@!@OL_USER2*!*OL_USER3@!@OL_USER3*!*OL_USER4@!@OL_USER4*!*OL_USER5@!@OL_USER5*!*SHIP_DATE@!@SHIP_DATE*!*BATCH1@!@BATCH1*!*BATCH2@!@BATCH2*!*DATE1@!@DATE1*!*DATE2@!@DATE2*!*COMMENT1@!@COMMENT1*!*COMMENT2@!@COMMENT2*!*COMMENT3@!@COMMENT3*!*COMMENT4@!@COMMENT4*!*COMMENT5@!@COMMENT5*!*BATCH1_TITLE@!@BATCH1_TITLE*!*BATCH2_TITLE@!@BATCH2_TITLE*!*DATE1_TITLE@!@DATE1_TITLE*!*DATE2_TITLE@!@DATE2_TITLE*!*COMMENT1_TITLE@!@COMMENT1_TITLE*!*COMMENT2_TITLE@!@COMMENT2_TITLE*!*COMMENT3_TITLE@!@COMMENT3_TITLE*!*COMMENT4_TITLE@!@COMMENT4_TITLE*!*COMMENT5_TITLE@!@COMMENT5_TITLE*!*C_EXTERNAL_ID@!@C_EXTERNAL_ID*!*ALT_DESC_1@!@ALT_DESC_1*!*ALT_DESC_2@!@ALT_DESC_2")
+        f.Data.DataTable.SaveToDB("dtWOL","con","Z_SF_WORKORD","",128,v.Local.fieldMap)       
+        'Stopping Logging
+        F.Global.BI.StopLogging(V.Global.iBILogID)
+        'Printing Crystal Report
+        F.Intrinsic.Control.CallSub(Callbi)
+    Function.Intrinsic.Control.EndIf
+F.Intrinsic.Control.EndIf
+Function.Intrinsic.Control.CallSub(Unload)
+
+F.Intrinsic.Control.ExitSub
+
+F.Intrinsic.Control.Label("LoadData_Err")
+F.Intrinsic.Control.If(V.Ambient.ErrorNumber,<>,0)
+    Function.Intrinsic.String.Concat("Project: GCG_6542_PrinterSelectionPreProc.g2u",V.Ambient.Newline,V.Ambient.Newline,"Subroutine: ",V.Ambient.CurrentSubroutine,V.Ambient.NewLine,"Error Occurred ",V.Ambient.ErrorNumber," with description ",V.Ambient.ErrorDescription,V.Local.sError)
+    F.Intrinsic.UI.Msgbox(V.Local.sError)
+    F.Intrinsic.Control.CallSub(Unload)
+Function.Intrinsic.Control.EndIf
+Program.Sub.LoadData.End
+
+Program.Sub.CallBI.Start
+F.Intrinsic.Control.SetErrorHandler("CallBI_Err")
+F.Intrinsic.Control.ClearErrors
+
+Variable.Local.sError.Declare(String)
+Variable.Local.iRet.Declare(Long)
+Function.Global.BI.RunReportPreProcessor(V.Global.iBIRunID,V.Global.iBILogID,"","","",-1,True,"",-1,"",-1,"","",V.Local.iRet)
+
+F.Intrinsic.Control.ExitSub
+
+F.Intrinsic.Control.Label("CallBI_Err")
+F.Intrinsic.Control.If(V.Ambient.ErrorNumber,<>,0)
+    Function.Intrinsic.String.Concat("Project: GCG_6542_PrinterSelectionPreProc.g2u",V.Ambient.Newline,V.Ambient.Newline,"Subroutine: ",V.Ambient.CurrentSubroutine,V.Ambient.NewLine,"Error Occurred ",V.Ambient.ErrorNumber," with description ",V.Ambient.ErrorDescription,V.Local.sError)
+    F.Intrinsic.UI.Msgbox(V.Local.sError)
+    F.Intrinsic.Control.CallSub(Unload)
+Function.Intrinsic.Control.EndIf
+
+
+Program.Sub.CallBI.End
+
+Program.Sub.Comments.Start
+${$0$}$BIR_PU_PO_Receipt$}$Mitch$}$3/25/2014
+${$5$}$3.0.0.0$}$1
+${$6$}$bmedina$}$20220407112323499$}$kOipCrsyLBVj2KoSwkcdK23ChxGVcBlEwmHmP2NDT4gN0Sja8g1er92K7ZV8C49N3i+dkSK6As0=
+Program.Sub.Comments.End
+
